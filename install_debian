@@ -1,0 +1,45 @@
+#!/bin/bash
+#https://askubuntu.com/questions/253632/how-do-i-get-a-ralink-rt3290-wireless-card-working
+#https://airvpn.org/linux/
+#https://airvpn.org/eddie/download/?
+
+##test si root
+echo "test if root"
+# test si on est root
+test_user=`whoami`
+if [ $test_user != "root" ]; then
+  echo "a lancer en root ou sous sudo"
+  exit
+fi
+platform=linux&arch=x64&ui=ui&format=debian.deb&version=2.10&r=0.69227411628746
+apt-get update && apt-get install build-essential linux-headers-generic
+
+
+aptitude install linux-headers-`uname -r`
+
+aptitude install linux-headers-3.16.0-4-amd64
+apt-get install firmware-misc-nonfree
+wget -qO - https://eddie.website/repository/keys/eddie_maintainer_gpg.key|sudo apt-key add -
+wget https://eddie.website/download/?platform=linux&arch=x64&ui=ui&format=debian.deb&version=2.13.6&r=0.14733429618565863
+dpkg -i './eddie-ui_2.13.6_linux_x64_debian.deb'
+apt-get install macchanger macchanger-gtk
+apt-get install linux-image
+apt-get install gcc make
+rfkill unblock wifi
+
+#https://forums.kali.org/showthread.php?21985-How-to-make-mac-address-random-at-each-boot-up
+#We only wish to point out that if a user spoofs the mac using either the terminal window or the method outlined in this #thread, then goes to surf the net thinking the mac is spoofed, network manager overrides the spoofed mac address and uses #its own setting found in the /etc/NetworkManager/system-connections/ folder. If there is no mac spoof address listed in the #network-manager drop down menu and/or the system-connections folder then Network-manager uses the device mac. These mac #spoofing routines run at start only hold true IF Network-manager is not called into play.
+
+#We suggest users manually put in mac spoof addresses for all connection listed in network-manager.
+
+#Musket Teams 
+vi /etc/init.d/macc.sh
+
+echo /"#!/bin/bash ifconfig wlan0 down macchanger -r wlan0 ifconfig wlan0 up">/etc/init.d/macc.sh
+ chmod +x /etc/init.d/macc.sh
+/usr/sbin/update-rc.d macc.sh defaults 100
+
+apt-get  install virtualbox virtualbox-guest-additions
+# Comment ajouter VBoxGuestAdditions.iso en ligne de commande?Sur la machine virtuelle, dans le menu Démarrer de Windows, #tapez Exécuter dans le champ de recherche, puis appuyez sur la touche Entrée. La boîte de dialogue Exécuter s'affiche. #Entrez D:\VBoxWindowsAdditions.exe /with_autologon dans le champ Ouvrir,VBoxGuestAdditions.iso
+/sbin/vboxconfig
+#https://netix.dl.sourceforge.net/project/codeblocks/Binaries/16.01/Windows/codeblocks-16.01mingw-setup.exe
